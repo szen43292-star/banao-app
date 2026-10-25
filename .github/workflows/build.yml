@@ -59,7 +59,8 @@ jobs:
         working-directory: mobile/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          set -o pipefail
+          ./gradlew assembleDebug --no-daemon 2>&1 | tee ../../gradle.log || { grep -A12 -E "What went wrong|error:|e: " ../../gradle.log | head -40 | while IFS= read -r l; do echo "::error title=Android build::$l"; done; exit 1; }
       - run: cp mobile/android/app/build/outputs/apk/debug/app-debug.apk Banao.apk
       - uses: actions/upload-artifact@v4
         with:
@@ -90,10 +91,11 @@ jobs:
       - name: Build app (no signing)
         working-directory: mobile/ios/App
         run: |
+          set -o pipefail
           xcodebuild -project App.xcodeproj -scheme App -configuration Release \
             -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
             MARKETING_VERSION="$BANAO_VERSION" CURRENT_PROJECT_VERSION="$BANAO_VERSION_CODE" \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build 2>&1 | tee ../../../xcode.log || { grep -E "error:|BUILD FAILED" ../../../xcode.log | head -30 | while IFS= read -r l; do echo "::error title=iPhone build::$l"; done; exit 1; }
       - name: Package IPA
         run: |
           mkdir -p Payload
@@ -129,7 +131,7 @@ jobs:
   site:
     name: Download website (with the new apps)
     needs: [android, ios, windows]
-    if: always() && needs.windows.result == 'success'
+    if: always() && needs.windows.result == 'success' && needs.android.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
