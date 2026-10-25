@@ -215,7 +215,7 @@ function softCSS(s){ return '.sw{' + Object.entries(softVars(s)).map(([k,v]) => 
 /* Runs inside the generated management software (serialised with toString — keep it self-contained). */
 function mountSoftware(host, spec, opts){
   opts = opts || {};
-  var I = spec.icons || {}, cur = spec.currency || '₹', SA = !!opts.standalone, QR = opts.qr || null;
+  var I = spec.icons || {}, cur = spec.currency || '₹', SA = !!opts.standalone, QR = opts.qr || null, SAVE = opts.save || null;
   var mods = spec.modules.filter(function(m){ return m.on !== false; });
   var KEY = 'mistri:' + spec.slug;
   var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -495,7 +495,7 @@ function mountSoftware(host, spec, opts){
   }
   function refreshTable(){ var m = modBy(S.view); if (!m) return render(); var w = host.querySelector('[data-tbl]'); if (w) w.innerHTML = tableHTML(m, filtered(m)); var tb = host.querySelector('.tbar .grow'); if (tb) tb.textContent = S.q ? filtered(m).length + ' of ' + data[m.id].length + ' shown' : 'Tap a column name to sort'; }
   function refreshPos(){ var c = host.querySelector('[data-cart]'); if (c) c.outerHTML = cartHTML(); var p = host.querySelector('[data-plist]'); if (p) p.innerHTML = plistHTML(); }
-  function download(name, text, type){ var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type: type})); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+  function download(name, text, type){ if (SAVE) { SAVE(name, text, type); return; } var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type: type})); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500); }
   function parseCSV(t){ var rows = [], row = [], f = '', q = false; t = String(t).replace(/^﻿/, ''); var first = t.split('\n')[0], sep = (first.match(/;/g) || []).length > (first.match(/,/g) || []).length ? ';' : ','; for (var i = 0; i < t.length; i++) { var c = t[i]; if (q) { if (c === '"') { if (t[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; } else if (c === '"') q = true; else if (c === sep || c === '\t') { row.push(f); f = ''; } else if (c === '\n' || c === '\r') { if (c === '\r' && t[i + 1] === '\n') i++; row.push(f); rows.push(row); row = []; f = ''; } else f += c; } if (f !== '' || row.length) { row.push(f); rows.push(row); } return rows.filter(function(r){ return r.some(function(x){ return String(x).trim(); }); }); }
   function importRows(m, text){
     var rows = parseCSV(text); if (!rows.length) return 0;

@@ -234,7 +234,7 @@ h2{font-family:var(--f-disp);font-weight:800;font-size:clamp(32px,4.4vw,54px);li
       <li class="plat" data-plat="windows">
         <span class="you" hidden>Your device</span>
         <div class="plat-h"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.3l7.4-1v7.2H3zm8.3-1.1L21 3v8.4h-9.7zM3 12.4h7.4v7.2L3 18.6zm8.3 0H21V21l-9.7-1.3z"/></svg><h3>Windows</h3></div>
-        <p>Opens in its own window. Projects stay on your computer.</p>
+        <p>Opens in its own window. Choose where to save each file in File Explorer.</p>
         <div class="spec"><span><b>File</b>Banao.exe</span><span><b>Size</b>{{EXE_SIZE}}</span><span><b>Needs</b>Windows 10 or 11</span></div>
         <a class="btn btn-acc" href="/downloads/Banao.exe" download>Download for Windows</a>
       </li>
@@ -248,7 +248,7 @@ h2{font-family:var(--f-disp);font-weight:800;font-size:clamp(32px,4.4vw,54px);li
       <li class="plat" data-plat="android" id="android-card">
         <span class="you" hidden>Your device</span>
         <div class="plat-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg><h3>Android</h3></div>
-        <p>The phone app, with bills and files saved straight to your phone.</p>
+        <p>The phone app. Everything you make saves straight to your phone’s Downloads.</p>
         <div class="spec"><span><b>File</b>Banao.apk</span><span><b>Size</b><span id="apk-size">–</span></span><span><b>Needs</b>Android 7 or newer</span></div>
         <span class="soon" id="apk-soon">Coming soon</span>
         <a class="btn btn-acc" id="apk-btn" href="/downloads/Banao.apk" download hidden>Download for Android</a>
@@ -275,7 +275,7 @@ h2{font-family:var(--f-disp);font-weight:800;font-size:clamp(32px,4.4vw,54px);li
         <ol>
           <li><span>Download <b>Banao.exe</b> and open it from your Downloads folder.</span></li>
           <li><span>If Windows says “Windows protected your PC”, click <b>More info</b>, then <b>Run anyway</b>. This shows up because Banao is new and not yet signed with a certificate.</span></li>
-          <li><span>Banao opens in its own window. Right-click its icon in the taskbar and choose <b>Pin to taskbar</b> to open it quickly next time.</span></li>
+          <li><span>Banao opens in its own window. When you download a website or software, a Save window lets you pick the folder. Right-click Banao’s taskbar icon and choose <b>Pin to taskbar</b>.</span></li>
         </ol>
         <p class="note">Banao uses Microsoft Edge, which comes with Windows 10 and 11, to show its window. Your projects are kept in <code>%LOCALAPPDATA%\Banao</code>. To remove Banao, delete Banao.exe and that folder.</p>
         <p class="hash">SHA-256 of Banao.exe, to check your download<code>{{EXE_SHA}}</code></p>
@@ -297,7 +297,7 @@ h2{font-family:var(--f-disp);font-weight:800;font-size:clamp(32px,4.4vw,54px);li
           <li><span>Android asks whether to allow installing apps from Chrome (or your Files app). Turn on <b>Allow from this source</b>, then go back.</span></li>
           <li><span>Tap <b>Install</b>. Banao appears with your other apps. If Play Protect asks, choose <b>Install anyway</b>.</span></li>
         </ol>
-        <p class="note">Files you save in Banao go to Documents › Banao, and the share menu opens so you can send them on WhatsApp or save them to Drive.</p>
+        <p class="note">Websites and software you make in Banao save straight to <b>Downloads › Banao</b> on your phone. Open them from the Files app, or tap <b>Send</b> to share one on WhatsApp.</p>
       </div>
       <div class="howto" id="howto-iphone" hidden>
         <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 5h3"/></svg>iPhone (advanced)</h3>
@@ -306,7 +306,7 @@ h2{font-family:var(--f-disp);font-weight:800;font-size:clamp(32px,4.4vw,54px);li
           <li><span>Connect your iPhone with a cable, drag Banao.ipa into Sideloadly and sign in with your Apple ID.</span></li>
           <li><span>On the iPhone, open Settings › General › VPN &amp; Device Management, trust your Apple ID, then open Banao.</span></li>
         </ol>
-        <p class="note">Apple lets apps installed this way run for 7 days before they need installing again. The App Store version will not need this.</p>
+        <p class="note">Apple lets apps installed this way run for 7 days before they need installing again. The App Store version will not need this. Files you make in Banao save to <b>Files › On My iPhone › Banao</b>.</p>
       </div>
     </div>
   </div>
@@ -414,7 +414,7 @@ h2{font-family:var(--f-disp);font-weight:800;font-size:clamp(32px,4.4vw,54px);li
     var len = Number(r.headers.get('content-length')) || 0;
     document.getElementById('apk-soon').hidden = true; document.getElementById('apk-btn').hidden = false; document.getElementById('howto-android').hidden = false;
     if (len) document.getElementById('apk-size').textContent = (len / 1048576).toFixed(1) + ' MB';
-    if (plat === 'android') setPrimary({href:'/downloads/Banao.apk', label:'Download for Android', meta:'Android 7 or newer' + (len ? ' · ' + (len / 1048576).toFixed(1) + ' MB' : ''), note:'After downloading, open the file and allow installing from this source when Android asks.'});
+    if (plat === 'android') setPrimary({href:'/downloads/Banao.apk', label:'Download for Android', meta:'Android 7 or newer' + (len ? ' · ' + (len / 1048576).toFixed(1) + ' MB' : ''), note:'Banao.apk saves to your phone’s Downloads. Open it from there and allow installing from this source when Android asks.'});
   }).catch(function () {});
   /* the iPhone file is for sideloading until the App Store version is out */
   if (window.fetch) fetch('/downloads/Banao.ipa', {method:'HEAD', cache:'no-store'}).then(function (r) {

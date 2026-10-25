@@ -7,11 +7,33 @@ const DL = CAP('downloads');
 /* inside the Android or iPhone app, files are saved and shared through the phone */
 const NATIVE = (() => { try { const C = window.Capacitor; return C && typeof C.nativePromise === 'function' && typeof C.isNativePlatform === 'function' && C.isNativePlatform() ? C : null; } catch (e) { return null; } })();
 async function nativeSave(name, data){
-  let saved = '';
-  try { await NATIVE.nativePromise('Filesystem', 'writeFile', {path:'Banao/' + name, data, directory:'DOCUMENTS', encoding:'utf8', recursive:true}); saved = 'Documents › Banao'; } catch (e) {}
-  const r = await NATIVE.nativePromise('Filesystem', 'writeFile', {path:name, data, directory:'CACHE', encoding:'utf8', recursive:true});
-  try { await NATIVE.nativePromise('Share', 'share', {title:name, files:[r.uri], dialogTitle:'Save or send ' + name}); } catch (e) {}
-  return saved;
+  const android = NATIVE.getPlatform && NATIVE.getPlatform() === 'android';
+  const r = android
+    ? await NATIVE.nativePromise('Filesystem', 'writeFile', {path:'Download/Banao/' + name, data, directory:'EXTERNAL_STORAGE', encoding:'utf8', recursive:true})
+    : await NATIVE.nativePromise('Filesystem', 'writeFile', {path:name, data, directory:'DOCUMENTS', encoding:'utf8', recursive:true});
+  STATE.lastSaved = {name, uri:r && r.uri};
+  return android ? 'Downloads › Banao' : 'Files › On My iPhone › Banao';
+}
+async function nativeShare(){
+  const f = STATE.lastSaved; if (!f || !f.uri) return;
+  try { await NATIVE.nativePromise('Share', 'share', {title:f.name, files:[f.uri], dialogTitle:'Send ' + f.name}); } catch (e) {}
+}
+/* one place that saves any file Banao makes, straight onto the device */
+async function saveFile(name, text, mime){
+  if (NATIVE) return {where:await nativeSave(name, text), native:true};
+  const d = await DL;
+  if (d) { const r = await d.save({filename:name, data:text}); return {where:r && r.status === 'delivered' ? 'sent' : 'your downloads'}; }
+  if (window.showSaveFilePicker) {
+    try {
+      mime = String(mime || 'text/html').split(';')[0];
+      const ext = (name.match(/\.[a-z0-9]+$/i) || ['.html'])[0];
+      const h = await window.showSaveFilePicker({suggestedName:name, types:[{description:ext === '.html' ? 'Web page' : ext === '.csv' ? 'Spreadsheet (CSV)' : 'File', accept:{[mime || 'text/html']:[ext]}}]});
+      const w = await h.createWritable(); await w.write(new Blob([text], {type:mime || 'text/html'})); await w.close();
+      return {where:'the folder you chose', picked:h.name};
+    } catch (e) { if (e && e.name === 'AbortError') return {cancelled:true}; }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type:mime || 'text/html'})); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  return {where:'your Downloads folder'};
 }
 if (NATIVE) document.addEventListener('click', e => {
   const a = (e.composedPath ? e.composedPath() : [e.target]).find(n => n && n.tagName === 'A');
@@ -188,7 +210,7 @@ function updatePreview(){
     host.scrollTop = keep;
   } else {
     shadow.innerHTML = '<style>' + softCSS(s) + '</style><div class="mount" style="height:100%"></div>';
-    mountSoftware(shadow.querySelector('.mount'), Object.assign({}, s, {icons:ICONS}), {store:PV_STORE, standalone:false, qr:makeQR});
+    mountSoftware(shadow.querySelector('.mount'), Object.assign({}, s, {icons:ICONS}), {store:PV_STORE, standalone:false, qr:makeQR, save:(name, text, type) => saveFile(name, text, type).then(r => { if (!r.cancelled) toast('Saved ' + name + (r.native ? ' to ' + r.where : '')); }).catch(() => toast('Could not save ' + name))});
   }
 }
 let pvT; function previewSoon(){ clearTimeout(pvT); pvT = setTimeout(updatePreview, 140); }
@@ -319,15 +341,15 @@ function openSelf(){
 function closeModal(){ const m = $('#modal'); m.hidden = true; m.innerHTML = ''; }
 async function doDownload(){
   const msg = $('#m-msg');
-  if (NATIVE) { try { const where = await nativeSave(STATE.exportName, STATE.exportHTML); msg.textContent = where ? 'Saved in ' + where + '. You can also send it from the share menu.' : 'Choose where to keep or send ' + STATE.exportName + '.'; } catch (e) { msg.textContent = 'This phone could not save the file. Use Copy code instead.'; } return; }
-  const d = await DL;
-  if (!d) {
-    try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([STATE.exportHTML], {type:'text/html'})); a.download = STATE.exportName; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); msg.textContent = 'Downloading ' + STATE.exportName + '. If nothing appears, use Copy code.'; }
-    catch (e) { msg.textContent = 'Downloads are not available here. Use Copy code instead.'; }
-    return;
+  try {
+    const r = await saveFile(STATE.exportName, STATE.exportHTML, 'text/html');
+    if (r.cancelled) { msg.textContent = 'Not saved.'; return; }
+    if (r.native) { msg.innerHTML = 'Saved to <b>' + esc(r.where) + '</b> as ' + esc(STATE.exportName) + '. Find it in your Files app. <button class="mini" type="button" data-act="sharefile">' + ico('wa') + 'Send</button>'; return; }
+    msg.textContent = r.picked ? 'Saved ' + r.picked + '.' : r.where === 'sent' ? 'Sent.' : 'Saved ' + STATE.exportName + ' to ' + r.where + '.';
+  } catch (e) {
+    const c = e && e.code;
+    msg.textContent = c === 'declined' ? 'Download cancelled. Nothing was saved.' : c === 'rate_limited' ? 'A download prompt is already open. Finish that one first.' : NATIVE ? 'Banao could not save to your phone. Allow storage access for Banao in your phone settings, or use Copy code.' : 'This view cannot save files. Use Copy code instead.';
   }
-  try { const r = await d.save({filename:STATE.exportName, data:STATE.exportHTML}); msg.textContent = r && r.status === 'delivered' ? 'Sent.' : 'Saved ' + STATE.exportName + '. Open it from your downloads.'; }
-  catch (e) { const c = e && e.code; msg.textContent = c === 'declined' ? 'Download cancelled. Nothing was saved.' : c === 'rate_limited' ? 'A download prompt is already open. Finish that one first.' : 'This view cannot save files. Use Copy code instead.'; }
 }
 async function doCopy(){
   const msg = $('#m-msg');
@@ -388,6 +410,7 @@ document.addEventListener('click', e => {
   else if (act === 'getapp') openSelf();
   else if (act === 'close-modal') closeModal();
   else if (act === 'download') doDownload();
+  else if (act === 'sharefile') nativeShare();
   else if (act === 'copy') doCopy();
   else if (act === 'rmimg') { s.image = ''; renderPanel(); updatePreview(); saveSoon(); }
   else if (act === 'jump') $('#stage').scrollIntoView({behavior:'smooth', block:'start'});

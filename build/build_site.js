@@ -4,7 +4,8 @@
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const sharp = require('sharp');
 const R = path.join(__dirname, '..'), SITE = path.join(R, 'site'), WWW = path.join(R, 'www'), SRC = path.join(R, 'site-src');
-const VERSION = '1.0.0', DATE = '25 October 2026';
+const VERSION = process.env.BANAO_VERSION || '1.0.0';
+const DATE = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric', timeZone:'Asia/Kolkata'});
 const cp = (a, b) => { fs.mkdirSync(path.dirname(b), {recursive:true}); fs.copyFileSync(a, b); };
 const sha = buf => crypto.createHash('sha256').update(buf).digest('hex');
 const size = n => n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
@@ -81,6 +82,7 @@ const vars = {VERSION, DATE, EXE_SIZE:size(exe.length), EXE_SHA:sha(exe), HTML_S
 `);
   fs.writeFileSync(path.join(SITE, '_redirects'), '/windows  /downloads/Banao.exe  302\n/mac  /downloads/Banao.html  302\n/download  /#download  302\n/app/*  /  301\n');
   fs.writeFileSync(path.join(SITE, 'robots.txt'), 'User-agent: *\nAllow: /\n');
+  fs.writeFileSync(path.join(SITE, 'netlify.toml'), '# Netlify serves this folder as it is; there is nothing to build.\n[build]\n  publish = "."\n');
   const walk = d => fs.readdirSync(d, {withFileTypes:true}).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
   const all = walk(SITE);
   console.log('download site built:', all.length, 'files,', size(all.reduce((a, f) => a + fs.statSync(f).size, 0)), '| exe', vars.EXE_SIZE, '| html', vars.HTML_SIZE);

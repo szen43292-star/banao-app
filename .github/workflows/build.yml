@@ -10,6 +10,10 @@ on:
 permissions:
   contents: write
 
+env:
+  BANAO_VERSION: 1.0.${{ github.run_number }}
+  BANAO_VERSION_CODE: ${{ github.run_number }}
+
 jobs:
   web:
     name: App files (fonts, icons, page)
@@ -88,6 +92,7 @@ jobs:
         run: |
           xcodebuild -project App.xcodeproj -scheme App -configuration Release \
             -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            MARKETING_VERSION="$BANAO_VERSION" CURRENT_PROJECT_VERSION="$BANAO_VERSION_CODE" \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
       - name: Package IPA
         run: |
@@ -151,6 +156,14 @@ jobs:
           npm ci
           node build_site.js
       - run: cd site && zip -qr ../banao-download-website.zip .
+      - name: Publish the website to the site branch (Netlify deploys from it)
+        run: |
+          cd site
+          git init -q
+          git checkout -q -b site
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "Download website, Banao $BANAO_VERSION"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" site
       - uses: actions/upload-artifact@v4
         with:
           name: Banao-website
