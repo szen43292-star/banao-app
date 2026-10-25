@@ -1,0 +1,19 @@
+{
+  "name": "banao-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Banao: website and software builder, as an Android and iPhone app",
+  "scripts": {
+    "sync": "cap sync"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/filesystem": "8.1.4",
+    "@capacitor/ios": "8.5.3",
+    "@capacitor/share": "8.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

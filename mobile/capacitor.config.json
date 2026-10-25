@@ -1,0 +1,11 @@
+{
+  "appId": "com.banaoapp.builder",
+  "appName": "Banao",
+  "webDir": "../www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "never"
+  }
+}

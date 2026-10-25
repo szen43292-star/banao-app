@@ -1,0 +1,178 @@
+# Builds Banao for Android (.apk), iPhone (.ipa, unsigned) and Windows (.exe)
+# on GitHub's machines, then attaches all three to a GitHub Release.
+name: Build Banao apps
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  web:
+    name: App files (fonts, icons, page)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build www from src
+        working-directory: build
+        run: |
+          npm ci
+          node build_app.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: www
+          path: www
+
+  android:
+    name: Android APK
+    needs: web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: www
+          path: www
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Copy Banao into the Android project
+        working-directory: mobile
+        run: |
+          npm ci
+          npx cap sync android
+      - name: Build APK
+        working-directory: mobile/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+      - run: cp mobile/android/app/build/outputs/apk/debug/app-debug.apk Banao.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Banao-android
+          path: Banao.apk
+
+  ios:
+    name: iPhone IPA (unsigned)
+    needs: web
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: actions/download-artifact@v4
+        with:
+          name: www
+          path: www
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Copy Banao into the iPhone project
+        working-directory: mobile
+        run: |
+          npm ci
+          npx cap sync ios
+      - name: Build app (no signing)
+        working-directory: mobile/ios/App
+        run: |
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -R mobile/ios/App/build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -qry Banao-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Banao-iphone
+          path: Banao-unsigned.ipa
+
+  windows:
+    name: Windows EXE
+    needs: web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: www
+          path: www
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build Banao.exe with Zig
+        run: |
+          pip install ziglang==0.17.0
+          ZIG="python3 -m ziglang" sh windows/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Banao-windows
+          path: windows/Banao.exe
+
+  site:
+    name: Download website (with the new apps)
+    needs: [android, ios, windows]
+    if: always() && needs.windows.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: www
+          path: www
+      - uses: actions/download-artifact@v4
+        with:
+          name: Banao-windows
+          path: windows
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Banao-*
+          path: downloads-extra
+          merge-multiple: true
+        continue-on-error: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build the download website
+        working-directory: build
+        run: |
+          npm ci
+          node build_site.js
+      - run: cd site && zip -qr ../banao-download-website.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Banao-website
+          path: banao-download-website.zip
+
+  release:
+    name: Publish release
+    needs: [android, ios, windows, site]
+    if: always() && (needs.android.result == 'success' || needs.windows.result == 'success' || needs.ios.result == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          pattern: Banao-*
+          merge-multiple: true
+      - run: ls -la out
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Banao 1.0.${{ github.run_number }}
+          body: |
+            Banao for Android (Banao.apk), Windows (Banao.exe) and iPhone (Banao-unsigned.ipa, needs signing before it installs).
+            See the README for how to install each one.
+          files: out/*

@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Download Banao: website and software builder</title>
+<meta name="description" content="Download Banao for Windows, Mac and Linux. Build websites and business software with GST bills, WhatsApp orders and UPI payments. Free, no API key, works offline.">
+<meta name="theme-color" content="#14162B">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Download Banao">
+<meta property="og:description" content="Build websites and business software on your own computer. Free, no API key, works offline.">
+<meta property="og:image" content="/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/fonts/files/bricolage-grotesque-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+/* Layout: a download counter. The right file for your device up front, the product shown as proof, then every platform, how to install each, and answers. */
+:root{
+  --ground:#F2F3F7; --sheet:#FFFFFF; --sunk:#F6F7FA; --ink:#14162B; --ink-2:#33385A; --muted:#5E6483; --line:#E1E4EC; --line-2:#C9CEDC;
+  --brick:#F2A900; --on-brick:#231A00; --brick-ink:#8A5D00; --brick-soft:#FFF2CC; --band:#14162B; --on-band:#F2F3F7; --on-band-2:#B9BDD3;
+  --ok:#137A47; --dot:rgba(20,22,43,.09); --glow:rgba(242,169,0,.18); --ring:rgba(242,169,0,.34);
+  --shadow:0 1px 2px rgba(20,22,43,.05),0 14px 34px -16px rgba(20,22,43,.22);
+  --shadow-lg:0 2px 4px rgba(20,22,43,.04),0 40px 80px -36px rgba(20,22,43,.38);
+  --f-disp:'Bricolage Grotesque','Hanken Grotesk',system-ui,sans-serif;
+  --f-body:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D0F1C; --sheet:#161A2E; --sunk:#111427; --ink:#ECEEF8; --ink-2:#C7CBE3; --muted:#969CBA; --line:#262B47; --line-2:#39405F;
+    --brick:#F6B51E; --on-brick:#1A1300; --brick-ink:#F6C251; --brick-soft:#33280A; --band:#05060E; --on-band:#ECEEF8; --on-band-2:#969CBA;
+    --ok:#4ADE80; --dot:rgba(236,238,248,.07); --glow:rgba(246,181,30,.10); --ring:rgba(246,181,30,.38);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 36px -16px rgba(0,0,0,.7); --shadow-lg:0 2px 4px rgba(0,0,0,.3),0 40px 80px -30px rgba(0,0,0,.85); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D0F1C; --sheet:#161A2E; --sunk:#111427; --ink:#ECEEF8; --ink-2:#C7CBE3; --muted:#969CBA; --line:#262B47; --line-2:#39405F;
+  --brick:#F6B51E; --on-brick:#1A1300; --brick-ink:#F6C251; --brick-soft:#33280A; --band:#05060E; --on-band:#ECEEF8; --on-band-2:#969CBA;
+  --ok:#4ADE80; --dot:rgba(236,238,248,.07); --glow:rgba(246,181,30,.10); --ring:rgba(246,181,30,.38);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 36px -16px rgba(0,0,0,.7); --shadow-lg:0 2px 4px rgba(0,0,0,.3),0 40px 80px -30px rgba(0,0,0,.85); color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--ground)}
+h1,h2,h3,p,ul,ol,figure{margin:0}
+ul,ol{padding:0;list-style:none}
+img{max-width:100%;display:block}
+[hidden]{display:none!important}
+a{color:inherit}
+code{font-family:var(--f-mono);font-size:.9em}
+:focus-visible{outline:3px solid var(--brick);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.ic{width:18px;height:18px;flex:none}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--ground) 86%,transparent);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:24px;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--f-disp);font-weight:800;font-size:24px;letter-spacing:-.03em;text-decoration:none}
+.logo svg{width:34px;height:34px}
+.nav{display:flex;gap:4px;margin-left:auto}
+.nav a{text-decoration:none;font-weight:600;font-size:15px;color:var(--ink-2);padding:8px 12px;border-radius:9px}
+.nav a:hover{background:var(--sheet);color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 20px;border-radius:12px;font-weight:700;font-size:15.5px;text-decoration:none;white-space:nowrap;border:1.5px solid transparent;cursor:pointer;font-family:inherit;transition:transform .15s ease,filter .15s ease,border-color .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-acc{background:var(--brick);color:var(--on-brick);box-shadow:inset 0 -2px 0 rgba(0,0,0,.12)}
+.btn-acc:hover{filter:brightness(1.05)}
+.btn-ghost{background:var(--sheet);color:var(--ink);border-color:var(--line-2)}
+.btn-ghost:hover{border-color:var(--ink-2)}
+.btn-lg{min-height:58px;padding:0 28px;font-size:17px;border-radius:14px}
+.btn[aria-disabled="true"]{opacity:.6;cursor:default;transform:none;pointer-events:none}
+
+/* hero */
+.hero{position:relative;isolation:isolate;overflow:hidden;padding-block:64px 0}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background-image:radial-gradient(var(--dot) 1.1px,transparent 1.2px);background-size:22px 22px;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 25%,#000 30%,transparent 75%);mask-image:radial-gradient(ellipse 70% 60% at 50% 25%,#000 30%,transparent 75%)}
+.hero::after{content:"";position:absolute;left:50%;top:-200px;width:1000px;height:560px;transform:translateX(-50%);z-index:-1;background:radial-gradient(closest-side,var(--glow),transparent);pointer-events:none}
+.hero-copy{max-width:1000px;margin:0 auto;text-align:center;display:flex;flex-direction:column;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;border-radius:99px;background:var(--sheet);border:1px solid var(--line);font-size:13.5px;font-weight:600;color:var(--ink-2);box-shadow:var(--shadow)}
+.badge i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px color-mix(in srgb,var(--ok) 20%,transparent)}
+h1{font-family:var(--f-disp);font-weight:800;font-size:clamp(40px,7vw,86px);line-height:.96;letter-spacing:-.045em;margin-top:24px;text-wrap:balance}
+.hl{position:relative;white-space:nowrap}
+.hl::after{content:"";position:absolute;left:-2%;right:-2%;bottom:-.06em;height:.3em;z-index:-1;background:var(--brick);border-radius:4px;transform:skewX(-8deg) rotate(-1deg)}
+.lead{font-size:clamp(17px,1.7vw,20px);color:var(--muted);max-width:34em;margin-top:22px;text-wrap:pretty}
+.cta{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:34px}
+.cta-meta{margin-top:14px;font-size:14px;color:var(--muted)}
+.cta-note{margin-top:10px;font-size:14.5px;color:var(--ink-2);max-width:34em}
+.cta-note:empty{display:none}
+.shot-main{margin-top:56px;border-radius:18px 18px 0 0;overflow:hidden;border:1px solid var(--line);border-bottom:0;box-shadow:var(--shadow-lg);background:var(--sheet)}
+.shot-bar{display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;background:var(--sunk);border-bottom:1px solid var(--line);font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.shot-bar i{width:10px;height:10px;border-radius:50%;background:var(--line-2)}
+.shot-bar span{margin-left:10px}
+.shot-main img{width:100%;height:auto}
+
+/* platforms */
+.sec{padding-block:96px}
+.sec-tight{padding-top:0}
+.kicker{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--brick-ink);font-weight:600;display:flex;align-items:center;gap:10px}
+.kicker::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--brick)}
+h2{font-family:var(--f-disp);font-weight:800;font-size:clamp(32px,4.4vw,54px);line-height:1.02;letter-spacing:-.035em;margin-top:14px;text-wrap:balance}
+.sec-lead{font-size:18px;color:var(--muted);max-width:36em;margin-top:16px}
+.plats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:44px}
+.plat{background:var(--sheet);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:10px;position:relative}
+.plat.mine{border-color:var(--brick);box-shadow:0 0 0 3px var(--ring)}
+.plat .you{position:absolute;top:-12px;left:20px;background:var(--brick);color:var(--on-brick);font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px}
+.plat .you[hidden]{display:none}
+.plat-h{display:flex;align-items:center;gap:12px}
+.plat-h svg{width:30px;height:30px;flex:none}
+.plat h3{font-size:20px;letter-spacing:-.01em}
+.plat p{color:var(--muted);font-size:14.5px}
+.spec{display:flex;flex-direction:column;gap:4px;font-size:13.5px;color:var(--ink-2);padding:12px 0;border-block:1px dashed var(--line);margin-top:4px}
+.spec span{display:flex;justify-content:space-between;gap:10px}
+.spec b{font-weight:600;color:var(--muted)}
+.plat .btn{margin-top:auto;width:100%}
+.soon{margin-top:auto;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--line-2);border-radius:12px;text-align:center;padding:14px}
+
+/* install help */
+.install{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:44px}
+.howto{background:var(--sheet);border:1px solid var(--line);border-radius:20px;padding:26px}
+.howto h3{font-size:20px;display:flex;align-items:center;gap:10px}
+.howto h3 svg{width:24px;height:24px}
+.howto ol{counter-reset:s;display:flex;flex-direction:column;gap:14px;margin-top:18px}
+.howto li{counter-increment:s;display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;font-size:15.5px}
+.howto li::before{content:counter(s);width:28px;height:28px;border-radius:8px;background:var(--brick-soft);color:var(--brick-ink);display:grid;place-items:center;font-family:var(--f-mono);font-weight:600;font-size:13px}
+.howto .note{margin-top:18px;padding-top:16px;border-top:1px dashed var(--line);font-size:14px;color:var(--muted)}
+.hash{margin-top:12px;font-size:12.5px;color:var(--muted)}
+.hash code{display:block;margin-top:4px;padding:8px 10px;background:var(--sunk);border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere;color:var(--ink-2)}
+
+/* what it makes */
+.shelf{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:56px;align-items:start}
+.shelf + .shelf{margin-top:96px}
+.ticks{display:flex;flex-direction:column;gap:12px;margin-top:28px}
+.ticks li{display:flex;gap:12px;align-items:flex-start;font-size:16px}
+.ticks .ic{width:22px;height:22px;margin-top:1px;padding:3px;border-radius:50%;background:var(--brick-soft);color:var(--brick-ink)}
+.grid-shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card-shot{background:var(--sheet);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.card-shot img{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top}
+.card-shot figcaption{display:flex;justify-content:space-between;gap:10px;padding:10px 14px;font-size:14px;font-weight:600;border-top:1px solid var(--line)}
+.card-shot figcaption span{color:var(--muted);font-weight:500}
+.card-shot.wide{grid-column:1/-1}
+
+/* closing band */
+.band{background:var(--band);color:var(--on-band);text-align:center}
+.band h2{color:var(--on-band)}
+.band .sec-lead{color:var(--on-band-2);margin-inline:auto}
+.band .cta-meta{color:var(--on-band-2)}
+
+/* faq */
+.faq{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:56px;align-items:start}
+.qa{border-bottom:1px solid var(--line)}
+.qa summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;font-weight:700;font-size:17.5px}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary::after{content:"";width:10px;height:10px;flex:none;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translate(-3px,-3px);transition:transform .15s}
+.qa[open] summary::after{transform:rotate(-135deg) translate(-3px,-3px)}
+.qa p{color:var(--muted);padding-bottom:20px;max-width:40em}
+.foot{border-top:1px solid var(--line);padding-block:28px 40px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:14px}
+.foot nav{display:flex;gap:18px;flex-wrap:wrap}
+.foot a{text-decoration:none;font-weight:600;color:var(--ink-2)}
+
+@media (max-width: 1040px){ .plats{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width: 980px){
+  .shelf,.faq,.install{grid-template-columns:minmax(0,1fr);gap:32px}
+  .install{gap:16px}
+  .nav{display:none}
+  .top-in .btn{margin-left:auto}
+}
+@media (max-width: 600px){
+  .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .hero{padding-top:40px}
+  .cta{flex-direction:column;align-self:stretch}
+  .cta .btn{width:100%}
+  .sec{padding-block:64px}
+  .plats,.grid-shots{grid-template-columns:minmax(0,1fr)}
+  .shot-main{margin-top:40px;max-width:380px;margin-left:auto;margin-right:auto;border-radius:28px 28px 0 0;border-width:6px 6px 0;border-color:var(--ink)}
+  .shot-bar{display:none}
+  .top-in .btn{min-height:40px;padding:0 14px;font-size:14px}
+  .howto{padding:20px}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} html{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="logo" href="/" aria-label="Banao home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--ink)"/><rect x="6" y="17.5" width="9.5" height="7" rx="1.6" fill="#F2A900"/><rect x="16.5" y="17.5" width="9.5" height="7" rx="1.6" fill="#F2A900"/><rect x="11.25" y="9.5" width="9.5" height="7" rx="1.6" fill="#F2A900"/></svg>
+      Banao
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#download">Downloads</a>
+      <a href="#install">How to install</a>
+      <a href="#makes">What it makes</a>
+      <a href="#faq">Questions</a>
+    </nav>
+    <a class="btn btn-acc" href="#download">Download</a>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <p class="badge"><i></i>Version {{VERSION}} · Free · Works offline</p>
+      <h1>Download Banao. <span class="hl">Build anything.</span></h1>
+      <p class="lead">Describe your business and Banao builds the website or management software for it, with GST bills, WhatsApp orders and UPI payments. It runs on your own computer, with no API key and no internet needed.</p>
+      <div class="cta">
+        <a class="btn btn-acc btn-lg" id="primary" href="/downloads/Banao.exe" download>
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><span id="primary-label">Download for Windows</span>
+        </a>
+        <a class="btn btn-ghost btn-lg" href="#download">Other platforms</a>
+      </div>
+      <p class="cta-meta" id="primary-meta">Windows 10 and 11 · {{EXE_SIZE}} · Released {{DATE}}</p>
+      <p class="cta-note" id="primary-note"></p>
+    </div>
+    <figure class="shot-main">
+      <div class="shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>Banao · StrideX shoe brand website</span></div>
+      <picture>
+        <source media="(max-width: 600px)" srcset="/shots/phone-editor.webp" width="780" height="1560">
+        <img src="/shots/studio-editor.webp" width="1800" height="1138" alt="Banao on a computer: business details on the left, a live preview of the StrideX shoe brand website on the right, and a box to type changes such as “make it premium”.">
+      </picture>
+    </figure>
+  </div>
+</section>
+
+<section class="sec" id="download">
+  <div class="wrap">
+    <p class="kicker">Downloads</p>
+    <h2>Choose your device</h2>
+    <p class="sec-lead">Every version builds the same websites and software, and saves your projects on your own device.</p>
+    <ul class="plats">
+      <li class="plat" data-plat="windows">
+        <span class="you" hidden>Your device</span>
+        <div class="plat-h"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.3l7.4-1v7.2H3zm8.3-1.1L21 3v8.4h-9.7zM3 12.4h7.4v7.2L3 18.6zm8.3 0H21V21l-9.7-1.3z"/></svg><h3>Windows</h3></div>
+        <p>Opens in its own window. Projects stay on your computer.</p>
+        <div class="spec"><span><b>File</b>Banao.exe</span><span><b>Size</b>{{EXE_SIZE}}</span><span><b>Needs</b>Windows 10 or 11</span></div>
+        <a class="btn btn-acc" href="/downloads/Banao.exe" download>Download for Windows</a>
+      </li>
+      <li class="plat" data-plat="mac">
+        <span class="you" hidden>Your device</span>
+        <div class="plat-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><h3>Mac, Linux, Chromebook</h3></div>
+        <p>One file that opens in Safari, Chrome or Firefox. No installing.</p>
+        <div class="spec"><span><b>File</b>Banao.html</span><span><b>Size</b>{{HTML_SIZE}}</span><span><b>Needs</b>Any modern browser</span></div>
+        <a class="btn btn-acc" href="/downloads/Banao.html" download>Download the file</a>
+      </li>
+      <li class="plat" data-plat="android" id="android-card">
+        <span class="you" hidden>Your device</span>
+        <div class="plat-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg><h3>Android</h3></div>
+        <p>The phone app, with bills and files saved straight to your phone.</p>
+        <div class="spec"><span><b>File</b>Banao.apk</span><span><b>Size</b><span id="apk-size">–</span></span><span><b>Needs</b>Android 7 or newer</span></div>
+        <span class="soon" id="apk-soon">Coming soon</span>
+        <a class="btn btn-acc" id="apk-btn" href="/downloads/Banao.apk" download hidden>Download for Android</a>
+      </li>
+      <li class="plat" data-plat="iphone">
+        <span class="you" hidden>Your device</span>
+        <div class="plat-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 5h3"/></svg><h3>iPhone and iPad</h3></div>
+        <p id="ipa-text">Coming to the App Store. Apple only allows apps from the App Store on iPhone.</p>
+        <div class="spec"><span><b>File</b><span id="ipa-file">App Store</span></span><span><b>Size</b><span id="ipa-size">–</span></span><span><b>Needs</b>iOS 15 or newer</span></div>
+        <span class="soon" id="ipa-soon">Coming soon</span>
+        <a class="btn btn-ghost" id="ipa-btn" href="/downloads/Banao.ipa" download hidden>Download IPA (advanced)</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="sec sec-tight" id="install">
+  <div class="wrap">
+    <p class="kicker">How to install</p>
+    <h2>Up and running in a minute</h2>
+    <div class="install">
+      <div class="howto">
+        <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.3l7.4-1v7.2H3zm8.3-1.1L21 3v8.4h-9.7zM3 12.4h7.4v7.2L3 18.6zm8.3 0H21V21l-9.7-1.3z"/></svg>Windows</h3>
+        <ol>
+          <li><span>Download <b>Banao.exe</b> and open it from your Downloads folder.</span></li>
+          <li><span>If Windows says “Windows protected your PC”, click <b>More info</b>, then <b>Run anyway</b>. This shows up because Banao is new and not yet signed with a certificate.</span></li>
+          <li><span>Banao opens in its own window. Right-click its icon in the taskbar and choose <b>Pin to taskbar</b> to open it quickly next time.</span></li>
+        </ol>
+        <p class="note">Banao uses Microsoft Edge, which comes with Windows 10 and 11, to show its window. Your projects are kept in <code>%LOCALAPPDATA%\Banao</code>. To remove Banao, delete Banao.exe and that folder.</p>
+        <p class="hash">SHA-256 of Banao.exe, to check your download<code>{{EXE_SHA}}</code></p>
+      </div>
+      <div class="howto">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>Mac, Linux and Chromebook</h3>
+        <ol>
+          <li><span>Download <b>Banao.html</b> and move it somewhere you’ll find it, like your Documents folder.</span></li>
+          <li><span>Double-click it. It opens in your web browser and works without internet.</span></li>
+          <li><span>Bookmark it, or keep it in your dock or on your desktop, and always open it in the same browser.</span></li>
+        </ol>
+        <p class="note">Your projects are saved inside that browser. Clearing the browser’s site data removes them, so download your finished websites and software as files to keep copies.</p>
+        <p class="hash">SHA-256 of Banao.html<code>{{HTML_SHA}}</code></p>
+      </div>
+      <div class="howto" id="howto-android" hidden>
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>Android</h3>
+        <ol>
+          <li><span>Download <b>Banao.apk</b> on your phone and tap it when the download finishes.</span></li>
+          <li><span>Android asks whether to allow installing apps from Chrome (or your Files app). Turn on <b>Allow from this source</b>, then go back.</span></li>
+          <li><span>Tap <b>Install</b>. Banao appears with your other apps. If Play Protect asks, choose <b>Install anyway</b>.</span></li>
+        </ol>
+        <p class="note">Files you save in Banao go to Documents › Banao, and the share menu opens so you can send them on WhatsApp or save them to Drive.</p>
+      </div>
+      <div class="howto" id="howto-iphone" hidden>
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 5h3"/></svg>iPhone (advanced)</h3>
+        <ol>
+          <li><span>On a Windows or Mac computer, download <b>Banao.ipa</b> and install Sideloadly or AltStore.</span></li>
+          <li><span>Connect your iPhone with a cable, drag Banao.ipa into Sideloadly and sign in with your Apple ID.</span></li>
+          <li><span>On the iPhone, open Settings › General › VPN &amp; Device Management, trust your Apple ID, then open Banao.</span></li>
+        </ol>
+        <p class="note">Apple lets apps installed this way run for 7 days before they need installing again. The App Store version will not need this.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-tight" id="makes">
+  <div class="wrap">
+    <div class="shelf">
+      <div>
+        <p class="kicker">What it makes</p>
+        <h2>Websites that take orders on WhatsApp</h2>
+        <p class="sec-lead">Hospitals, hotels, shoe brands, restaurants, salons, schools and more, with your name, prices and photos.</p>
+        <ul class="ticks">
+          <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Orders and bookings</b> arrive in your WhatsApp chat.</span></li>
+          <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>UPI QR code</b> for Google Pay, PhonePe and Paytm.</span></li>
+          <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>One file to publish.</b> Drag it onto Netlify Drop for a free public link.</span></li>
+        </ul>
+      </div>
+      <div class="grid-shots">
+        <figure class="card-shot"><img src="/shots/site-hospital.webp" width="1200" height="750" loading="lazy" alt="CityCare Hospital website made with Banao"><figcaption>CityCare Hospital <span>Clean</span></figcaption></figure>
+        <figure class="card-shot"><img src="/shots/site-shoes.webp" width="1200" height="750" loading="lazy" alt="StrideX shoe brand website made with Banao"><figcaption>StrideX shoes <span>Bold</span></figcaption></figure>
+        <figure class="card-shot"><img src="/shots/site-restaurant.webp" width="1200" height="750" loading="lazy" alt="Tadka Tales restaurant website made with Banao"><figcaption>Tadka Tales <span>Warm</span></figcaption></figure>
+        <figure class="card-shot"><img src="/shots/site-hotel.webp" width="1200" height="750" loading="lazy" alt="The Banyan Retreat hotel website made with Banao"><figcaption>The Banyan Retreat <span>Luxe</span></figcaption></figure>
+      </div>
+    </div>
+    <div class="shelf">
+      <div>
+        <h2>Software that runs your counter</h2>
+        <p class="sec-lead">Pharmacy, hospital, hotel, school, gym, shop, restaurant, dairy farm, or anything you describe.</p>
+        <ul class="ticks">
+          <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>GST bills</b> with CGST and SGST, and stock that goes down as you sell.</span></li>
+          <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Alerts</b> for low stock, expiring medicines and fees due.</span></li>
+          <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Excel import and export,</b> reports, backups and a password lock.</span></li>
+        </ul>
+      </div>
+      <div class="grid-shots">
+        <figure class="card-shot wide"><img src="/shots/soft-pharmacy.webp" width="1400" height="875" loading="lazy" alt="Pharmacy dashboard made with Banao, with sales today, low stock and expiry alerts"><figcaption>Pharmacy dashboard <span>Alerts and stock</span></figcaption></figure>
+        <figure class="card-shot"><img src="/shots/soft-pos.webp" width="1400" height="875" loading="lazy" alt="New bill screen in the pharmacy software"><figcaption>New bill <span>Counter billing</span></figcaption></figure>
+        <figure class="card-shot"><img src="/shots/soft-invoice.webp" width="1400" height="875" loading="lazy" alt="A saved GST bill with CGST, SGST and amount in words"><figcaption>GST bill <span>Print or WhatsApp</span></figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="faq" style="padding-top:0">
+  <div class="wrap faq">
+    <div>
+      <p class="kicker">Questions</p>
+      <h2>Before you download</h2>
+    </div>
+    <div>
+      <details class="qa" open><summary>Is Banao free?</summary><p>Yes. Banao and everything you make with it are free, and the websites and software you create are yours.</p></details>
+      <details class="qa"><summary>Do I need internet, an account or an API key?</summary><p>No. Banao works fully offline on your device. There is no sign-up and nothing you type is sent anywhere. Internet is only used, when available, to load nicer fonts in the websites you preview.</p></details>
+      <details class="qa"><summary>Why does Windows show a warning?</summary><p>Windows warns about new programs that are not yet signed with a paid certificate. Banao is safe to run: click More info, then Run anyway. You can also compare the file’s SHA-256 with the one shown under How to install.</p></details>
+      <details class="qa"><summary>Where are my projects saved?</summary><p>On your own device. On Windows they are in your user folder under AppData\Local\Banao. In the Mac and Linux file, they are saved in the browser you open it with.</p></details>
+      <details class="qa"><summary>When are the Android and iPhone apps coming?</summary><p>The Android app is next, followed by the App Store version for iPhone. When the Android app is ready, its download button appears on this page.</p></details>
+      <details class="qa"><summary>How do I put my website online?</summary><p>In Banao, click Download to save your website as one file. Rename it to index.html and drag it onto Netlify Drop. You get a free public link in about a minute.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="sec band">
+  <div class="wrap">
+    <h2>Ready to build?</h2>
+    <p class="sec-lead">Free, offline, and yours to keep.</p>
+    <div class="cta">
+      <a class="btn btn-acc btn-lg" id="primary2" href="/downloads/Banao.exe" download><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><span id="primary2-label">Download for Windows</span></a>
+    </div>
+    <p class="cta-meta">Version {{VERSION}} · Released {{DATE}}</p>
+  </div>
+</section>
+</main>
+
+<footer class="wrap foot">
+  <span>© 2026 Banao. Websites and software for small businesses.</span>
+  <nav aria-label="Footer"><a href="#download">Downloads</a><a href="#install">How to install</a><a href="#faq">Questions</a></nav>
+</footer>
+
+<script>
+(function () {
+  var ua = navigator.userAgent || '', touchMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+  var plat = /Android/i.test(ua) ? 'android' : (/iPhone|iPad|iPod/i.test(ua) || touchMac) ? 'iphone' : /Windows/i.test(ua) ? 'windows' : /Macintosh|Mac OS X|Linux|CrOS|X11/i.test(ua) ? 'mac' : 'windows';
+  var OPTIONS = {
+    windows: {href:'/downloads/Banao.exe', label:'Download for Windows', meta:'Windows 10 and 11 · {{EXE_SIZE}} · Released {{DATE}}', note:''},
+    mac: {href:'/downloads/Banao.html', label:/Macintosh|Mac OS X/.test(ua) ? 'Download for Mac' : 'Download for your computer', meta:'Opens in Safari, Chrome or Firefox · {{HTML_SIZE}} · Released {{DATE}}', note:''},
+    android: {href:'#download', label:'Android app coming soon', meta:'', note:'The Android app is on its way. Meanwhile, you can download Banao on a Windows, Mac or Linux computer.', off:true},
+    iphone: {href:'#download', label:'iPhone app coming soon', meta:'', note:'The iPhone app is coming to the App Store. Meanwhile, you can download Banao on a Windows, Mac or Linux computer.', off:true}
+  };
+  function setPrimary(o) {
+    ['primary', 'primary2'].forEach(function (id) {
+      var a = document.getElementById(id); if (!a) return;
+      a.href = o.href; document.getElementById(id + '-label').textContent = o.label;
+      if (o.off) { a.removeAttribute('download'); a.setAttribute('aria-disabled', 'true'); } else { a.setAttribute('download', ''); a.removeAttribute('aria-disabled'); }
+    });
+    var m = document.getElementById('primary-meta'); m.textContent = o.meta; m.hidden = !o.meta;
+    document.getElementById('primary-note').textContent = o.note;
+  }
+  setPrimary(OPTIONS[plat]);
+  var card = document.querySelector('.plat[data-plat="' + plat + '"]');
+  if (card) { card.classList.add('mine'); card.querySelector('.you').hidden = false; }
+  /* the Android button switches on by itself once downloads/Banao.apk is on the site */
+  if (window.fetch) fetch('/downloads/Banao.apk', {method:'HEAD', cache:'no-store'}).then(function (r) {
+    var type = r.headers.get('content-type') || '';
+    if (!r.ok || /text\/html/.test(type)) return;
+    var len = Number(r.headers.get('content-length')) || 0;
+    document.getElementById('apk-soon').hidden = true; document.getElementById('apk-btn').hidden = false; document.getElementById('howto-android').hidden = false;
+    if (len) document.getElementById('apk-size').textContent = (len / 1048576).toFixed(1) + ' MB';
+    if (plat === 'android') setPrimary({href:'/downloads/Banao.apk', label:'Download for Android', meta:'Android 7 or newer' + (len ? ' · ' + (len / 1048576).toFixed(1) + ' MB' : ''), note:'After downloading, open the file and allow installing from this source when Android asks.'});
+  }).catch(function () {});
+  /* the iPhone file is for sideloading until the App Store version is out */
+  if (window.fetch) fetch('/downloads/Banao.ipa', {method:'HEAD', cache:'no-store'}).then(function (r) {
+    var type = r.headers.get('content-type') || '';
+    if (!r.ok || /text\/html/.test(type)) return;
+    var len = Number(r.headers.get('content-length')) || 0;
+    document.getElementById('ipa-soon').hidden = true; document.getElementById('ipa-btn').hidden = false; document.getElementById('howto-iphone').hidden = false;
+    document.getElementById('ipa-file').textContent = 'Banao.ipa';
+    if (len) document.getElementById('ipa-size').textContent = (len / 1048576).toFixed(1) + ' MB';
+    document.getElementById('ipa-text').textContent = 'For now, install the IPA with Sideloadly or AltStore using your Apple ID. It needs re-signing every 7 days. The App Store version is coming.';
+    if (plat === 'iphone') document.getElementById('primary-note').textContent = 'The App Store version is coming. Until then, the iPhone file can be installed with Sideloadly or AltStore from a computer.';
+  }).catch(function () {});
+})();
+</script>
+</body>
+</html>

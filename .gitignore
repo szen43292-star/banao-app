@@ -1,0 +1,15 @@
+node_modules/
+windows/assets.h
+windows/Banao.exe
+mobile/android/app/build/
+mobile/android/build/
+mobile/android/.gradle/
+mobile/android/app/src/main/assets/public/
+mobile/ios/App/App/public/
+mobile/ios/App/build/
+mobile/ios/DerivedData/
+Payload/
+*.ipa
+*.apk
+.DS_Store
+*.pdb
